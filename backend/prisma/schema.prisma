@@ -1,0 +1,151 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model DAO {
+  id              String   @id @default(cuid())
+  daoName         String?
+  description     String?
+  daoAddress      String   @unique
+  nftAddress      String   @unique
+  governorAddress String?  @unique
+  escrowAddress   String?  @unique
+  creator         String
+  nftPrice        String?
+  treasuryAddress String?
+  createdAt       DateTime @default(now())
+  txHash          String   @unique
+
+  members         Member[]
+  proposals       Proposal[]
+  transactions    TreasuryTransaction[]
+  fiatOrders      FiatOrder[]
+
+  @@map("daos")
+}
+
+model Member {
+  id          String   @id @default(cuid())
+  daoId       String
+  userAddress String
+  nftBalance  Int      @default(0)
+  joinedAt    DateTime @default(now())
+
+  dao         DAO      @relation(fields: [daoId], references: [id])
+
+  @@unique([daoId, userAddress])
+  @@map("members")
+}
+
+model Proposal {
+  id            String         @id @default(cuid())
+  daoId         String
+  proposalId    String
+  proposer      String
+  title         String?
+  description   String?
+  recipient     String?
+  paymentAmount String?
+  status        ProposalStatus @default(PENDING)
+  votesFor      Int            @default(0)
+  votesAgainst  Int            @default(0)
+  txHash        String         @unique
+  createdAt     DateTime       @default(now())
+  deadline      DateTime?
+  executedAt    DateTime?
+
+  dao           DAO            @relation(fields: [daoId], references: [id])
+  votes         Vote[]
+
+  @@unique([daoId, proposalId])
+  @@map("proposals")
+}
+
+model Vote {
+  id           String   @id @default(cuid())
+  proposalId   String
+  voterAddress String
+  support      Boolean
+  weight       Int      @default(1)
+  txHash       String   @unique
+  createdAt    DateTime @default(now())
+
+  proposal     Proposal     @relation(fields: [proposalId], references: [id])
+
+  @@unique([proposalId, voterAddress])
+  @@map("votes")
+}
+
+model TreasuryTransaction {
+  id        String          @id @default(cuid())
+  daoId     String
+  type      TransactionType
+  amount    String
+  token     String          @default("BADUSD")
+  from      String?
+  to        String?
+  txHash    String          @unique
+  createdAt DateTime        @default(now())
+
+  dao       DAO             @relation(fields: [daoId], references: [id])
+
+  @@map("treasury_transactions")
+}
+
+model FiatOrder {
+  id                 String          @id @default(cuid())
+  daoId              String?
+  userPhone          String?
+  userAddress        String?
+  status             FiatOrderStatus @default(PENDING)
+  amountFiat         String
+  amountCrypto       String          // BADUSD amount
+  currency           String          @default("KES")
+  paymentProviderRef String          @unique // M-Pesa CheckoutRequestID
+  txHash             String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  dao                DAO?            @relation(fields: [daoId], references: [id])
+
+  @@map("fiat_orders")
+}
+
+// Index for resync capability
+model IndexerState {
+  id               String @id @default(cuid())
+  lastIndexedLedger BigInt @default(0)
+  network          String @unique
+
+  @@map("indexer_state")
+}
+
+enum ProposalStatus {
+  PENDING
+  ACTIVE
+  SUCCEEDED
+  DEFEATED
+  QUEUED
+  EXECUTED
+  CANCELLED
+}
+
+enum TransactionType {
+  DEPOSIT
+  ESCROW_PAYOUT
+  PROTOCOL_FEE
+}
+
+enum FiatOrderStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  MINTED
+}
