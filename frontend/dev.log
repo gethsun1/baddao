@@ -1,0 +1,12 @@
+nohup: ignoring input
+  ▲ Next.js 14.2.33
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+ ✓ Ready in 3.6s
+ ○ Compiling / ...
+ ✓ Compiled / in 19.9s (1794 modules)
+ GET / 200 in 21623ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /favicon.ico in 17.2s (1788 modules)
+ GET /favicon.ico 200 in 12347ms

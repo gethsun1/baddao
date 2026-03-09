@@ -139,10 +139,10 @@ export class ChainListenerService implements OnModuleInit, OnModuleDestroy {
             // envelopeXdr exists on GetSuccessfulTransactionResponse
             const envelopeXdr = (tx as rpc.Api.GetSuccessfulTransactionResponse).envelopeXdr;
             if (!envelopeXdr) return null;
-            const env = xdr.TransactionEnvelope.fromXDR(envelopeXdr as string, 'base64');
+            const env = envelopeXdr as unknown as xdr.TransactionEnvelope;
             // Supports both v0 and v1 envelope types
             if (env.switch().name === 'envelopeTypeTxV0') {
-                return StrKey.encodeEd25519PublicKey(env.v0().tx().sourceAccount().ed25519());
+                return StrKey.encodeEd25519PublicKey(env.v0().tx().sourceAccountEd25519());
             } else {
                 const muxed = env.v1().tx().sourceAccount();
                 if (muxed.switch().name === 'keyTypeEd25519') {

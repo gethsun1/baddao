@@ -15,6 +15,7 @@ export default function Navigation() {
                 src={baddologo} 
                 alt="BAD DAO" 
                 className="w-8 h-8 rounded-full border-2 border-red-500 m-1 object-cover"
+                unoptimized
               />
               <span className="font-display font-bold text-2xl tracking-tight text-white group-hover:text-gray-200 transition-colors">
                 BAD DAO
