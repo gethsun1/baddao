@@ -1,0 +1,19 @@
+# Node
+node_modules/
+dist/
+.next/
+build/
+.env
+
+# Rust / Soroban
+target/
+**/*.wasm
+
+# Foundry / EVM
+out/
+cache/
+.gas-snapshot/
+broadcast/
+
+# OS
+.DS_Store
